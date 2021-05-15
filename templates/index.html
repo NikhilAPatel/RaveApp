@@ -21,15 +21,18 @@
 
         function addColor(){
             num_colors = $("input[name='color']").length +1
-            $("#colorsDiv").append("<text><b>Color "+num_colors+" </b><input type=\"color\" name=\"color\" value=\""+getRandomColor()+"\"/><br/>")
+            $("#colorsDiv").append("<text id=\"color"+num_colors+"label\"><b>Color "+num_colors+" </b><input type=\"color\" id = \"color"+num_colors+"\"name=\"color\" value=\""+getRandomColor()+"\"/><br/>")
         }
 
         function removeColor(){
             //Don't do anything if there are only two colors
-            num_colors = $("input[name='color']").length +1
+            num_colors = $("input[name='color']").length
             if(num_colors<=2){
                 return;
             }
+
+            $("#color"+num_colors).remove();
+            $("#color"+num_colors+"label").remove();
         }
 
         function getRandomColor() {
@@ -56,9 +59,9 @@
     <input type="button" id = "addColor" value="Add Color" onclick="addColor()"/>
     <input type="button" id = "removeColor" value="Remove Color" onclick="removeColor()"/>
     <div id="colorsDiv" >
-        <text><b>Color 1 </b><input type="color" name="color"/>
+        <text id="color1label"><b>Color 1 </b><input type="color" id="color1" name="color"/>
         <br/>
-        <text><b>Color 2 </b><input type="color" name="color"/>
+        <text id="color2label"><b>Color 2 </b><input type="color" id="color2" name="color"/>
         <br/>
     </div>
     <br/>
