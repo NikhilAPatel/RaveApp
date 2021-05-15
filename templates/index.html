@@ -8,13 +8,21 @@
     <script>
         function submit(){
             var cpm = $("#cpm").val();
+            var colors="";
+            
+            colorFields = $("input[name='color']");
+            for(i=0;i<colorFields.length;i++){
+                colors+=colorFields[i].value;
+            }
+
             $.ajax({
                 url:"createRoom",
                 data:{
-                    room_number: room_number
+                    "cpm": cpm,
+                    "colors": colors
                 },
                 success: function(res){
-                    //.log(res);
+                    console.log(res);
                 }
             })
         }

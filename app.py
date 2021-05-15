@@ -20,11 +20,18 @@ def index():
 
 @app.route('/createRoom')
 def create_room():
-    room_number = request.args.get("room_number")
+    cpm = request.args.get("cpm")
+    colors = request.args.get("colors")
+
+    print(cpm)
+    print(colors)
+
+    #TODO generate room number
+    room_number = 0
     if room_number not in rooms:
         rooms.append(room_number)
     return {
-        "rooms": tuple(rooms)
+        "room_number": room_number
     }    
 
 #TODO
