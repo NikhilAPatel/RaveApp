@@ -28,6 +28,7 @@ def index():
 
 @app.route('/createRoom')
 def create_room():
+    
     cpm = request.args.get("cpm")
     colors = request.args.get("colors")
     
@@ -39,6 +40,10 @@ def create_room():
     dt = datetime.now()
     
     rooms[room_number]=Room(room_number, cpm, colors, dt.microsecond)
+
+    for i in range(0, 100):
+        print("created room")
+        print(rooms)
 
     return {
         "room_number": room_number,
