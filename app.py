@@ -54,12 +54,30 @@ def start_rave():
         room = rooms[int(room_number)]
     except(KeyError):
         #If it can't find the key, wait a few seconds and try again before failing
-        print(rooms)
-        return{
-            "success": False,
-            "error": "key error"
-        }
+        found = False
+        for i in range(0, 500):
+            try:
+                room = rooms[int(room_number)]
+                found = True
+            except(KeyError):
+                print("Key Error")
+            if(found==True):
+                break
+            time.sleep(.01)
         
+        if(not found):
+            return{
+                "success": False,
+                "error": "value error"
+            }
+        
+        return{
+            "success": True,
+            "colors": room.colors,
+            "cpm": room.cpm,
+            "created": room.created
+        }
+    
     except(ValueError):
         return{
             "success": False,
