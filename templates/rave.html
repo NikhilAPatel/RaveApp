@@ -11,6 +11,9 @@
         socket.on('connect', function(){
             socket.emit('join', {room_number: url});
         });
+        socket.on('checkAlive', function(){
+            socket.emit('confirmAlive', {room_number: url});
+        });
         socket.on('colorChange', function(event){
             console.log(event)
         })

@@ -6,6 +6,8 @@ class Room:
         self.cpm = cpm
         self.room_number = room_number
         self.colors = colors[1:].split("#")
+        self.awaiting_verify=False
+        self.time_since_verify=0
 
     def __str__(self):
         return "Dead: "+(str)(self.dead)+", CPM: "+(str)(self.cpm)+", Colors: "+(str)(self.colors)
