@@ -119,4 +119,4 @@ def fourOfour(request):
 # If we're running in stand alone mode, run the application
 if __name__ == '__main__':
     seed(872340789023)
-    app.run(debug=True)
+    app.run(debug=False)
