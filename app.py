@@ -44,6 +44,7 @@ def create_room():
     for i in range(0, 100):
         print("created room")
         print(rooms)
+        print(room_number)
 
     return {
         "room_number": room_number,
