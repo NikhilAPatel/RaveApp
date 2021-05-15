@@ -59,35 +59,27 @@ def on_join(data):
         room.time_since_verify=0
         room.awaiting_verfiy=False
         while not room.dead:
-            print(room.dead)
-            print("emitting to room " + room_number)
             socketio.emit("colorChange", room.colors[i%len(room.colors)], room=room_number)
-            i+=1
             
             #Checking periodically to make sure people are still raving
             if(i%10==0):
-                print("emitting verification")
                 socketio.emit("checkAlive", "Anyone there?", room=room_number)
                 room.awaiting_verify=True
             
             if(room.awaiting_verify):
-                print(room.time_since_verify)
                 room.time_since_verify +=1
             
             #Close the room if no client has verified in 100 cycles
             if(room.time_since_verify>100):
                 room.dead=True
             
-            #TODO real timing
-            time.sleep(.1)
+            i+=1
+            time.sleep(60/int(room.cpm))
 
 @socketio.on('confirmAlive')
 def on_aliveConfirmation(data):
     rooms[int(data['room_number'])].awaiting_verify=False
     rooms[int(data['room_number'])].time_since_verify=0
-
-
-
 
 
 @socketio.on('end')
@@ -96,10 +88,10 @@ def on_end(data):
 
 
 #TODO
-# # Supposed to catch 404 errors
-# @app.errorhandler(404)
-# def fourOfour(request):
-#     return render_template('404.html')
+# Supposed to catch 404 errors
+@app.errorhandler(404)
+def fourOfour(request):
+    return render_template('index.html')
 
 
 # If we're running in stand alone mode, run the application
