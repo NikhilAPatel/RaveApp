@@ -48,10 +48,16 @@ def rave(room_number):
 
 @socketio.on('join')
 def on_join(data):
-    room_number = data['room_number']    
-    room = rooms[int(room_number)]
-    
+    room_number = data['room_number']  
     join_room(room_number)
+    
+    #If this room does not exist, let the client know
+    try:
+        room = rooms[int(room_number)]
+    except(KeyError):
+        socketio.emit("invalidRoom", "How'd you get here, silly?", room=room_number)
+    except(ValueError):
+        socketio.emit("invalidRoom", "How'd you get here, silly?", room=room_number)
     
     if(room.dead):
         room.dead=False

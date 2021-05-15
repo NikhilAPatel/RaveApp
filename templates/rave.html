@@ -8,6 +8,9 @@
         var socket=io();
         var url = window.location.href;
         url = url.substring(url.lastIndexOf("/")+1, url.length)
+        socket.on('invalidRoom', function(){
+            location.replace("/");
+        })
         socket.on('connect', function(){
             socket.emit('join', {room_number: url});
         });
@@ -19,6 +22,7 @@
         })
         function end(){
             socket.emit('end', {room_number: url});
+            location.replace("/")
         }
     </script>
     <link rel="stylesheet" type="text/css" href="/static/css/style.css"></link>
