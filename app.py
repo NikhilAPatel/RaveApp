@@ -4,6 +4,8 @@ from flask import (
     request
 )
 from flask_cors import CORS
+from random import(seed, randint)
+from room import Room
 
 
 # Create the application instance
@@ -11,7 +13,7 @@ app = Flask(__name__, template_folder="templates")
 CORS(app)
 
 # Instantiate the list of rooms
-rooms = []
+rooms = {}
 
 # Create a URL route in our application for "/"
 @app.route('/')
@@ -22,14 +24,16 @@ def index():
 def create_room():
     cpm = request.args.get("cpm")
     colors = request.args.get("colors")
+    
+    # Generate room number
+    room_number = randint(0, 1000000)
+    while room_number in rooms.keys():
+        room_number = randint(0, 1000000)
+    
+    rooms[room_number]=Room(cpm, colors)
 
-    print(cpm)
-    print(colors)
+    print(rooms[room_number])
 
-    #TODO generate room number
-    room_number = 0
-    if room_number not in rooms:
-        rooms.append(room_number)
     return {
         "room_number": room_number
     }    
@@ -43,4 +47,5 @@ def create_room():
 
 # If we're running in stand alone mode, run the application
 if __name__ == '__main__':
+    seed(872340789023)
     app.run(debug=True)
