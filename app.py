@@ -41,6 +41,26 @@ def create_room():
         "room_number": room_number
     }
 
+@app.route('/joinRoom')
+def join_rave():
+    room_number = request.args.get("room_number")    
+    
+    #If this room does not exist, let the client know
+    try:
+        room = rooms[int(room_number)]
+    except(KeyError):
+        return{
+            "success": False
+        }
+    except(ValueError):
+        return{
+            "success": False
+        }
+    
+    return{
+        "success": True
+    }
+
 @app.route('/<room_number>')
 def rave(room_number):
     return render_template('rave.html')
@@ -50,6 +70,7 @@ def rave(room_number):
 def on_join(data):
     room_number = data['room_number']  
     join_room(room_number)
+    room=None
     
     #If this room does not exist, let the client know
     try:
@@ -86,11 +107,6 @@ def on_join(data):
 def on_aliveConfirmation(data):
     rooms[int(data['room_number'])].awaiting_verify=False
     rooms[int(data['room_number'])].time_since_verify=0
-
-
-@socketio.on('end')
-def on_end(data):
-    rooms[int(data['room_number'])].dead=True
 
 
 #TODO

@@ -20,16 +20,11 @@
         socket.on('colorChange', function(event){
             document.body.style.background="#"+event;
         })
-        function end(){
-            socket.emit('end', {room_number: url});
-            location.replace("/")
-        }
     </script>
     <link rel="stylesheet" type="text/css" href="/static/css/style.css"></link>
     <title>Rave</title>
 </head>
 <body>
     <h2>Raving</h2>
-    <input type="button" onclick="end()" value="end"/>
 </body>
 </html>

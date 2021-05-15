@@ -28,6 +28,28 @@
             })
         }
 
+        function join(){
+            var room_number = $("#joinRoom").val();
+            if(room_number==""||room_number==null){
+                alert("Please enter a room number")
+                return;
+            }
+
+            $.ajax({
+                url:"joinRoom",
+                data:{
+                    "room_number": room_number
+                },
+                success: function(res){
+                    if(res.success){
+                        location.href=room_number;
+                    }else{
+                        alert("Room does not exist")
+                    }
+                }
+            })
+        }
+
         function addColor(){
             num_colors = $("input[name='color']").length +1
             $("#colorsDiv").append("<text id=\"color"+num_colors+"label\"><b>Color "+num_colors+" </b><input type=\"color\" id = \"color"+num_colors+"\"name=\"color\" value=\""+getRandomColor()+"\"/><br/>")
