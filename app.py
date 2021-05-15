@@ -65,8 +65,7 @@ def start_rave():
             try:
                 room = rooms[int(room_number)]
                 found = True
-            except(KeyError):
-                print(rooms)
+            
             if(found==True):
                 break
             time.sleep(.01)
