@@ -15,7 +15,7 @@
             socket.emit('confirmAlive', {room_number: url});
         });
         socket.on('colorChange', function(event){
-            console.log(event)
+            document.body.style.background="#"+event;
         })
         function end(){
             socket.emit('end', {room_number: url});
