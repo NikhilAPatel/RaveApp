@@ -53,15 +53,16 @@ def on_join(data):
     
     join_room(room_number)
     
-    room.dead=False
-    i=0
-    while not room.dead:
-        print(room.dead)
-        print("emitting to room " + room_number)
-        socketio.emit("colorChange", room.colors[i%len(room.colors)], room=room_number)
-        i+=1
-        #TODO real timing
-        time.sleep(1)
+    if(room.dead):
+        room.dead=False
+        i=0
+        while not room.dead:
+            print(room.dead)
+            print("emitting to room " + room_number)
+            socketio.emit("colorChange", room.colors[i%len(room.colors)], room=room_number)
+            i+=1
+            #TODO real timing
+            time.sleep(1)
 
 
 
