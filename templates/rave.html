@@ -3,28 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
     <script type="text/javascript" charset="utf-8">
-        var socket=io();
-        var url = window.location.href;
-        url = url.substring(url.lastIndexOf("/")+1, url.length)
-        socket.on('invalidRoom', function(){
-            location.replace("/");
-        })
-        socket.on('connect', function(){
-            socket.emit('join', {room_number: url});
-        });
-        socket.on('checkAlive', function(){
-            socket.emit('confirmAlive', {room_number: url});
-        });
-        socket.on('colorChange', function(event){
-            document.body.style.background="#"+event;
-        })
+        async function rave(){
+            var url = window.location.href;
+            url = url.substring(url.lastIndexOf("/")+1, url.length)
+            $.ajax({
+                url:"rave",
+                data:{
+                    "room_number":  url
+                },
+                success: function(res){
+                    console.log(res)
+                    if(!res.success){
+                        location.replace("/");
+                        return;
+                    }
+                    
+                    // Do the raving
+                    dorave(res)
+                }
+            })
+        }
+        async function dorave(res){
+            while(true){
+                duration = (60/res.cpm)*1000
+                currentdate = new Date();
+                time_passed = currentdate-res.created;
+                //Determine what color it should be right now
+                index = time_passed%(duration*res.colors.length)
+                index = parseInt(index/duration)
+                document.body.style.background="#"+res.colors[index];
+
+                await new Promise(r => setTimeout(r, 1));
+            }
+            
+        }
     </script>
     <link rel="stylesheet" type="text/css" href="/static/css/style.css"></link>
     <title>Rave</title>
 </head>
-<body>
+<body onload="rave()">
     <h2>Raving</h2>
 </body>
 </html>

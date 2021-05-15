@@ -9,6 +9,7 @@ from random import(seed, randint)
 from room import Room
 import threading
 import time
+from datetime import datetime
 
 
 # Create the application instance
@@ -35,10 +36,36 @@ def create_room():
     while room_number in rooms.keys():
         room_number = randint(0, 1000000)
     
-    rooms[room_number]=Room(room_number, cpm, colors)
+    dt = datetime.now()
+    
+    rooms[room_number]=Room(room_number, cpm, colors, dt.microsecond)
 
     return {
-        "room_number": room_number
+        "room_number": room_number,
+    }
+
+@app.route('/rave')
+def start_rave():
+    room_number = request.args.get("room_number")    
+    room = None
+
+    #If this room does not exist, let the client know
+    try:
+        room = rooms[int(room_number)]
+    except(KeyError):
+        return{
+            "success": False
+        }
+    except(ValueError):
+        return{
+            "success": False
+        }
+    
+    return{
+        "success": True,
+        "colors": room.colors,
+        "cpm": room.cpm,
+        "created": room.created
     }
 
 @app.route('/joinRoom')
@@ -65,48 +92,6 @@ def join_rave():
 def rave(room_number):
     return render_template('rave.html')
 
-
-@socketio.on('join')
-def on_join(data):
-    room_number = data['room_number']  
-    join_room(room_number)
-    room=None
-    
-    #If this room does not exist, let the client know
-    try:
-        room = rooms[int(room_number)]
-    except(KeyError):
-        socketio.emit("invalidRoom", "How'd you get here, silly?", room=room_number)
-    except(ValueError):
-        socketio.emit("invalidRoom", "How'd you get here, silly?", room=room_number)
-    
-    if(room.dead):
-        room.dead=False
-        i=0
-        room.time_since_verify=0
-        room.awaiting_verfiy=False
-        while not room.dead:
-            socketio.emit("colorChange", room.colors[i%len(room.colors)], room=room_number)
-            
-            #Checking periodically to make sure people are still raving
-            if(i%10==0):
-                socketio.emit("checkAlive", "Anyone there?", room=room_number)
-                room.awaiting_verify=True
-            
-            if(room.awaiting_verify):
-                room.time_since_verify +=1
-            
-            #Close the room if no client has verified in 100 cycles
-            if(room.time_since_verify>100):
-                room.dead=True
-            
-            i+=1
-            time.sleep(60/int(room.cpm))
-
-@socketio.on('confirmAlive')
-def on_aliveConfirmation(data):
-    rooms[int(data['room_number'])].awaiting_verify=False
-    rooms[int(data['room_number'])].time_since_verify=0
 
 
 #TODO
