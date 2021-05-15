@@ -4,12 +4,14 @@ from flask import (
     request
 )
 from flask_cors import CORS
+from flask_socketio import (SocketIO, join_room, leave_room)
 from random import(seed, randint)
 from room import Room
 
 
 # Create the application instance
 app = Flask(__name__, template_folder="templates")
+socketio = SocketIO(app)
 CORS(app)
 
 # Instantiate the list of rooms
@@ -36,7 +38,17 @@ def create_room():
 
     return {
         "room_number": room_number
-    }    
+    }
+
+@app.route('/<room_number>')
+def rave(room_number):
+    return render_template('rave.html')
+
+
+@socketio.on('join')
+def on_join(data):
+    room_number = data['room_number']
+    print("joined room"+(str)(room_number))
 
 #TODO
 # # Supposed to catch 404 errors
