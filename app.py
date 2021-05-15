@@ -54,10 +54,10 @@ def start_rave():
         room = rooms[int(room_number)]
     except(KeyError):
         #If it can't find the key, wait a few seconds and try again before failing
+        print(rooms)
         return{
             "success": False,
-            "error": "key error",
-            "rooms": rooms
+            "error": "key error"
         }
         
     except(ValueError):
