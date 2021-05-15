@@ -14,11 +14,15 @@
         socket.on('colorChange', function(event){
             console.log(event)
         })
+        function end(){
+            socket.emit('end', {room_number: url});
+        }
     </script>
     <link rel="stylesheet" type="text/css" href="/static/css/style.css"></link>
     <title>Rave</title>
 </head>
 <body>
     <h2>Raving</h2>
+    <input type="button" onclick="end()" value="end"/>
 </body>
 </html>

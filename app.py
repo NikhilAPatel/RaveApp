@@ -48,51 +48,31 @@ def rave(room_number):
 
 @socketio.on('join')
 def on_join(data):
-    room_number = data['room_number']
-    print()
-    print(rooms)
-    print()
-    
-    def message(room_number, color):
-        socketio.emit("colorChange", color, room=room_number, broadcast=True)
-    
-    def startRave(room):
-        i = 0
-        while not room.dead:
-            print(room.room_number)
-            message(int(room.room_number), room.colors[i%len(room.colors)])
-            i+=1
-            #TODO real timing
-            time.sleep(1)
-    
+    room_number = data['room_number']    
     room = rooms[int(room_number)]
     
     join_room(room_number)
-    print(room_number)
-    message(room_number, "9042gig819048")
-    socketio.emit("colorChange", "928398129038", room=room_number)
+    
     room.dead=False
     i=0
     while not room.dead:
-        print(room.room_number)
+        print(room.dead)
+        print("emitting to room " + room_number)
         socketio.emit("colorChange", room.colors[i%len(room.colors)], room=room_number)
-        message(int(room.room_number), room.colors[i%len(room.colors)])
         i+=1
         #TODO real timing
         time.sleep(1)
 
-    if(room.dead):
-        room.dead=False
-        # x = threading.Thread(target=startRave, args=(room,))
-        # x.start()
-        startRave(room)
-
-    print("joined room"+(str)(room_number))
 
 
 
 
-
+@socketio.on('end')
+def on_end(data):
+    print("ending")
+    print("ending")
+    print("ending")
+    rooms[int(data['room_number'])].dead=True
 
 
 #TODO
