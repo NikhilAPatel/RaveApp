@@ -18,6 +18,7 @@ CORS(app)
 
 # Instantiate the list of rooms
 rooms = {}
+threads = {}
 
 # Create a URL route in our application for "/"
 @app.route('/')
@@ -51,34 +52,48 @@ def on_join(data):
     print()
     print(rooms)
     print()
+    
+    def message(room_number, color):
+        socketio.emit("colorChange", color, room=room_number, broadcast=True)
+    
+    def startRave(room):
+        i = 0
+        while not room.dead:
+            print(room.room_number)
+            message(int(room.room_number), room.colors[i%len(room.colors)])
+            i+=1
+            #TODO real timing
+            time.sleep(1)
+    
     room = rooms[int(room_number)]
     
-    
-
     join_room(room_number)
-    #message(room_number, '748723874')
-
-    if(room.dead):
-        room.dead=False
-        x = threading.Thread(target=startRave, args=(room,))
-        x.start()
-
-    print("joined room"+(str)(room_number))
-
-@socketio.on("colorChange")
-def message(room_number, color):
-    print("emitting")
-    socketio.emit("colorChange", color, broadcast=True)
-
-@socketio.on("colorChange")
-def startRave(room):
-    i = 0
+    print(room_number)
+    message(room_number, "9042gig819048")
+    socketio.emit("colorChange", "928398129038", room=room_number)
+    room.dead=False
+    i=0
     while not room.dead:
         print(room.room_number)
-        message(room.room_number, room.colors[i%len(room.colors)])
+        socketio.emit("colorChange", room.colors[i%len(room.colors)], room=room_number)
+        message(int(room.room_number), room.colors[i%len(room.colors)])
         i+=1
         #TODO real timing
         time.sleep(1)
+
+    if(room.dead):
+        room.dead=False
+        # x = threading.Thread(target=startRave, args=(room,))
+        # x.start()
+        startRave(room)
+
+    print("joined room"+(str)(room_number))
+
+
+
+
+
+
 
 #TODO
 # # Supposed to catch 404 errors

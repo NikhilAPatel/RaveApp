@@ -10,4 +10,4 @@ class Room:
     def __str__(self):
         return "Dead: "+(str)(self.dead)+", CPM: "+(str)(self.cpm)+", Colors: "+(str)(self.colors)
     
-    
+
