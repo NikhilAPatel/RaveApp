@@ -11,6 +11,9 @@
         socket.on('connect', function(){
             socket.emit('join', {room_number: url});
         });
+        socket.on('colorChange', function(event){
+            console.log(event)
+        })
     </script>
     <link rel="stylesheet" type="text/css" href="/static/css/style.css"></link>
     <title>Rave</title>

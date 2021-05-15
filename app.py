@@ -7,6 +7,8 @@ from flask_cors import CORS
 from flask_socketio import (SocketIO, join_room, leave_room)
 from random import(seed, randint)
 from room import Room
+import threading
+import time
 
 
 # Create the application instance
@@ -34,8 +36,6 @@ def create_room():
     
     rooms[room_number]=Room(cpm, colors)
 
-    print(rooms[room_number])
-
     return {
         "room_number": room_number
     }
@@ -48,7 +48,20 @@ def rave(room_number):
 @socketio.on('join')
 def on_join(data):
     room_number = data['room_number']
+    print()
+    print(rooms)
+    print()
+    room = rooms[int(room_number)]
+
+    join_room(room_number)
+
+    message(room_number)
+    
     print("joined room"+(str)(room_number))
+
+@socketio.on("colorChange")
+def message(room_number):
+    socketio.emit("colorChange", "colordoisidfiosChange", room=room_number)
 
 #TODO
 # # Supposed to catch 404 errors
