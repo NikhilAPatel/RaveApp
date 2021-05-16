@@ -10,6 +10,7 @@ from room import Room
 import threading
 import time
 from datetime import datetime
+import json
 
 
 # Create the application instance
@@ -17,9 +18,6 @@ app = Flask(__name__, template_folder="templates")
 socketio = SocketIO(app)
 CORS(app)
 
-# Instantiate the list of rooms
-rooms = {}
-threads = {}
 
 # Create a URL route in our application for "/"
 @app.route('/')
@@ -28,9 +26,10 @@ def index():
 
 @app.route('/createRoom')
 def create_room():
-    
     cpm = request.args.get("cpm")
     colors = request.args.get("colors")
+
+    rooms = get_rooms()
     
     # Generate room number
     room_number = randint(0, 1000000)
@@ -39,10 +38,7 @@ def create_room():
     
     dt = datetime.now()
     
-    print(room_number)
-    rooms[room_number]=Room(room_number, cpm, colors, dt.microsecond)
-    print("oifjdafo")
-    print(rooms)
+    add_room(room_number, cpm, colors[1:].split("#"), dt.microsecond, False)
 
     return {
         "room_number": room_number,
@@ -52,13 +48,12 @@ def create_room():
 def start_rave():
     room_number = request.args.get("room_number")    
     room = None
+    rooms = get_rooms()
 
     #If this room does not exist, let the client know
     try:
-        room = rooms[int(room_number)]
+        room = rooms[room_number]
     except(KeyError):
-        print("sakd")
-        print(rooms)
         return{
             "success": False,
             "room_number": room_number,
@@ -73,18 +68,19 @@ def start_rave():
     
     return{
         "success": True,
-        "colors": room.colors,
-        "cpm": room.cpm,
-        "created": room.created
+        "colors": room[room_number]['colors'],
+        "cpm": room[room_number]['cpm'],
+        "created": room[room_number]['created']
     }
 
 @app.route('/joinRoom')
 def join_rave():
     room_number = request.args.get("room_number")    
+    rooms=get_rooms()
     
     #If this room does not exist, let the client know
     try:
-        room = rooms[int(room_number)]
+        room = rooms[room_number]
     except(KeyError):
         return{
             "success": False
@@ -111,7 +107,31 @@ def fourOfour(request):
     return render_template('index.html')
 
 
+def get_rooms():    
+    with open("rooms.txt", "r") as my_file_read:
+        rooms=json.load(my_file_read)
+    
+    return rooms
+
+def add_room(room_number, cpm, colors, created, dead):
+    newRoom={
+        room_number:{
+            'cpm': cpm,
+            'colors': colors,
+            'created': created,
+            'dead': dead,
+            'room_number': room_number
+        }
+    }
+
+    rooms = get_rooms()
+    rooms[room_number]=newRoom
+
+    with open("rooms.txt", "w") as my_file:
+        obj = json.dump(rooms, my_file)
+
+
 # If we're running in stand alone mode, run the application
 if __name__ == '__main__':
     seed(872340789023)
-    app.run(debug=False)
+    app.run(debug=True)
