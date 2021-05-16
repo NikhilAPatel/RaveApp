@@ -39,7 +39,10 @@ def create_room():
     
     dt = datetime.now()
     
+    
     rooms[room_number]=Room(room_number, cpm, colors, dt.microsecond)
+    print("oifjdafo")
+    print(rooms)
 
     return {
         "room_number": room_number,
@@ -54,6 +57,7 @@ def start_rave():
     try:
         room = rooms[int(room_number)]
     except(KeyError):
+        print("sakd")
         print(rooms)
         return{
             "success": False,
