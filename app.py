@@ -41,11 +41,6 @@ def create_room():
     
     rooms[room_number]=Room(room_number, cpm, colors, dt.microsecond)
 
-    for i in range(0, 100):
-        print("created room")
-        print(rooms)
-        print(room_number)
-
     return {
         "room_number": room_number,
     }
@@ -59,29 +54,11 @@ def start_rave():
     try:
         room = rooms[int(room_number)]
     except(KeyError):
-        #If it can't find the key, wait a few seconds and try again before failing
-        found = False
-        for i in range(0, 500):
-            try:
-                room = rooms[int(room_number)]
-                found = True
-            except(KeyError):
-                x=1
-            if(found==True):
-                break
-            time.sleep(.01)
-        
-        if(not found):
-            return{
-                "success": False,
-                "error": "value error"
-            }
-        
         return{
-            "success": True,
-            "colors": room.colors,
-            "cpm": room.cpm,
-            "created": room.created
+            "success": False,
+            "room_number": room_number,
+            "rooms": rooms.keys(),
+            "error": "value error"
         }
     
     except(ValueError):

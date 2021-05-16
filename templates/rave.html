@@ -15,24 +15,24 @@
                 success: function(res){
                     console.log(res)
                     if(!res.success){
-                        location.replace("/");
+                        //location.replace("/");
                         return;
                     }
                     
                     // Do the raving
-                    dorave(res)
+                    dorave(res.colors, res.cpm, res.created)
                 }
             })
         }
-        async function dorave(res){
+        async function dorave(colors, cpm, created){
             while(true){
-                duration = (60/res.cpm)*1000
+                duration = (60/cpm)*1000
                 currentdate = new Date();
-                time_passed = currentdate-res.created;
+                time_passed = currentdate-created;
                 //Determine what color it should be right now
-                index = time_passed%(duration*res.colors.length)
+                index = time_passed%(duration*colors.length)
                 index = parseInt(index/duration)
-                document.body.style.background="#"+res.colors[index];
+                document.body.style.background="#"+colors[index];
 
                 await new Promise(r => setTimeout(r, 1));
             }
