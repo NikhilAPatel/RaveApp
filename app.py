@@ -39,7 +39,7 @@ def create_room():
     
     dt = datetime.now()
     
-    
+    print(room_number)
     rooms[room_number]=Room(room_number, cpm, colors, dt.microsecond)
     print("oifjdafo")
     print(rooms)
