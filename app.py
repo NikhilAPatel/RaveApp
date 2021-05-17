@@ -24,33 +24,35 @@ CORS(app)
 def index():
     return render_template('index.html')
 
+
 @app.route('/createRoom')
 def create_room():
     cpm = request.args.get("cpm")
     colors = request.args.get("colors")
 
     rooms = get_rooms()
-    
+
     # Generate room number
     room_number = randint(0, 1000000)
     while room_number in rooms.keys():
         room_number = randint(0, 1000000)
-    
+
     dt = datetime.now()
-    
+
     add_room(room_number, cpm, colors[1:].split("#"), dt.microsecond, False)
 
     return {
         "room_number": room_number,
     }
 
+
 @app.route('/rave')
 def start_rave():
-    room_number = request.args.get("room_number")    
+    room_number = request.args.get("room_number")
     room = None
     rooms = get_rooms()
 
-    #If this room does not exist, let the client know
+    # If this room does not exist, let the client know
     try:
         room = rooms[room_number]
     except(KeyError):
@@ -59,13 +61,13 @@ def start_rave():
             "room_number": room_number,
             "error": "value error"
         }
-    
+
     except(ValueError):
         return{
             "success": False,
             "error": "value error"
         }
-    
+
     return{
         "success": True,
         "colors": room[room_number]['colors'],
@@ -73,12 +75,13 @@ def start_rave():
         "created": room[room_number]['created']
     }
 
+
 @app.route('/joinRoom')
 def join_rave():
-    room_number = request.args.get("room_number")    
-    rooms=get_rooms()
-    
-    #If this room does not exist, let the client know
+    room_number = request.args.get("room_number")
+    rooms = get_rooms()
+
+    # If this room does not exist, let the client know
     try:
         room = rooms[room_number]
     except(KeyError):
@@ -89,33 +92,34 @@ def join_rave():
         return{
             "success": False
         }
-    
+
     return{
         "success": True
     }
+
 
 @app.route('/<room_number>')
 def rave(room_number):
     return render_template('rave.html')
 
 
-
-#TODO
+# TODO
 # Supposed to catch 404 errors
 @app.errorhandler(404)
 def fourOfour(request):
     return render_template('index.html')
 
 
-def get_rooms():    
+def get_rooms():
     with open("rooms.txt", "r") as my_file_read:
-        rooms=json.load(my_file_read)
-    
+        rooms = json.load(my_file_read)
+
     return rooms
 
+
 def add_room(room_number, cpm, colors, created, dead):
-    newRoom={
-        room_number:{
+    newRoom = {
+        room_number: {
             'cpm': cpm,
             'colors': colors,
             'created': created,
@@ -125,7 +129,7 @@ def add_room(room_number, cpm, colors, created, dead):
     }
 
     rooms = get_rooms()
-    rooms[room_number]=newRoom
+    rooms[room_number] = newRoom
 
     with open("rooms.txt", "w") as my_file:
         obj = json.dump(rooms, my_file)
