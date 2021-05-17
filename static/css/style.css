@@ -1,0 +1,13 @@
+.dropdown{
+    background-color:rgba(128, 128, 128, 0.534);
+    color:white;
+    font-family: Arial, Helvetica, sans-serif;
+    width: fit-content;
+    text-align: center;
+    border-radius: 10px;
+    margin: auto;
+}
+
+.roundedButton{
+    border-radius: 10px;
+}

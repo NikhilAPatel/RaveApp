@@ -12,7 +12,8 @@
             sessionStorage.setItem("hidden", "false");
             var url = window.location.href;
             url = url.substring(url.lastIndexOf("/")+1, url.length);
-            $("#roomNumber").html("Room Number: "+url);
+            sessionStorage.setItem("room_number", url);
+            $("#roomNumber").html("&nbspRoom Number: "+url);
             rave(url);
         }
 
@@ -62,13 +63,13 @@
             sessionStorage.setItem("hidden", "false");
         }
 
-        function copy(){
-            console.log("fjdop")
-            var url = window.location.href;
-            url = url.substring(url.lastIndexOf("/")+1, url.length);
-            var cop = "https://ravebynikhil.herokuapp.com/"+url;
-            cop.select();
-            document.execCommand('copy', false)
+        function copylink(){
+            const el = document.createElement('textarea');
+            el.value = "https://ravebynikhil.herokuapp.com/"+sessionStorage.getItem('room_number');
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
         }
 
     </script>
@@ -78,9 +79,10 @@
 <body onload="init()">
     <div id="instructions" class="dropdown">
         <text id="roomNumber"></text>
-        <input type="button" value="Copy Inivte Link" id="url" onlick="copy()"/>
-        <text>Spacebar to toggle this block</text> 
-        <input type="button" value="End" onclick="endRave()"/>
+        <text> | Press Spacebar To Toggle This Block &nbsp</text> 
+        <br/>
+        <input type="button" class="btn btn-info" value="Copy Invite Link" onclick="copylink()"/>
+        <input type="button" class="btn btn-danger" value="End Rave" onclick="endRave()"/>
     </div>
     <script>
         document.addEventListener('keyup', event => {
