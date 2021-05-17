@@ -8,6 +8,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <link rel="stylesheet" type="text/css" href="/static/css/style.css"></link>
     <title>Rave</title>
+    <link rel="icon" type="image/png" href="/static/img/RaveLogoRRounded.png"/>
     <script>
         function submit(){
             var cpm = $("#cpm").val();
@@ -88,8 +89,7 @@
 </head>
 <body onload="assignColors()">
 <div class="container">
-    <h1 style="text-align: center; margin:auto">Rave By Nikhil</h1>
-    <br/>
+    <img src="/static/img/RaveLogoFull.png"\ style="width:40%;height:auto;display:block;margin-left:auto;margin-right:auto;">
     <h2>Start A Custom Rave</h2>
     <label for="cpm"><b>Color Changes per Minute:</b></label><input class="form-control input-sm" style="width:20%"type="number" value="100" id = "cpm"/>
     <br/>
@@ -119,5 +119,11 @@
     <br/>
     <input type="button" class="btn btn-primary" value="Join!" onclick="join()"/>
 </div>
+<footer>
+    <hr/>
+    <text class="subtext">&nbsp&nbsp&nbsp<span>&#169</span> 2021 Nikhil Patel</text>
+    <text style="float:right">&nbsp&nbsp&nbsp</text><a href='https://github.com/NikhilAPatel/RaveApp'><img style="float:right;width:25px;height:auto" src='/static/img/GitHub-Mark-120px-plus.png'/></a><text class="subtext" style="text-align:right;float:right;">See the code:&nbsp</text>
+    <br/>
+<footer>
 </body>
 </html>
