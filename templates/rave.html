@@ -3,19 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css"></link>
     <script type="text/javascript" charset="utf-8">
-        async function rave(){
+        function init(){
+            sessionStorage.setItem("hidden", "false");
             var url = window.location.href;
-            url = url.substring(url.lastIndexOf("/")+1, url.length)
+            url = url.substring(url.lastIndexOf("/")+1, url.length);
+            $("#roomNumber").html("Room Number: "+url);
+            $("#url").html("htbertps://ravebynikhil.herokuapp.com/"+url);
+            $("#url").attr("href", "https://ravebynikhil.herokuapp.com/"+url);
+            rave(url);
+        }
+
+        async function rave(room_number){
             $.ajax({
                 url:"rave",
                 data:{
-                    "room_number":  url
+                    "room_number":  room_number
                 },
                 success: function(res){
-                    console.log(res)
                     if(!res.success){
-                        //location.replace("/");
+                        location.replace("/");
                         return;
                     }
                     
@@ -38,11 +46,42 @@
             }
             
         }
+
+        function endRave(){
+            location.href("/")
+        }
+
+        function hide_instructions(){
+            $("#instructions").hide();
+            sessionStorage.setItem("hidden", "true");
+        }
+
+        function unhide_instructions(){
+            $("#instructions").show();
+            sessionStorage.setItem("hidden", "false");
+        }
+
     </script>
     <link rel="stylesheet" type="text/css" href="/static/css/style.css"></link>
     <title>Rave</title>
 </head>
-<body onload="rave()">
-    <h2>Raving</h2>
+<body onload="init()">
+    <div id="instructions" class="dropdown">
+        <text id="roomNumber"></text>
+        <a id="url"></a>
+        <text>Spacebar to toggle this block</text> 
+        <input type="button" value="End" onclick="endRave()"/>
+    </div>
+    <script>
+        document.addEventListener('keyup', event => {
+            if (event.code === 'Space') {
+                if(sessionStorage.getItem("hidden")=="true"){
+                    unhide_instructions();    
+                }else{
+                    hide_instructions();
+                }
+            }
+        })
+    </script
 </body>
 </html>

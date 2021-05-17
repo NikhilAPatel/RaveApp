@@ -103,8 +103,7 @@ def rave(room_number):
     return render_template('rave.html')
 
 
-# TODO
-# Supposed to catch 404 errors
+# Redirect 404s to the home page
 @app.errorhandler(404)
 def fourOfour(request):
     return render_template('index.html')
