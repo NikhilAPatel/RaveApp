@@ -3,7 +3,8 @@ from flask import (
     render_template,
     request,
     redirect,
-    g
+    g,
+    session
 )
 from flask_cors import CORS
 from flask_socketio import (SocketIO, join_room, leave_room)
@@ -16,12 +17,13 @@ from datetime import datetime
 import json
 from urllib.parse import quote
 
-
+# TODO hide api keys
 
 # Create the application instance
 app = Flask(__name__, template_folder="templates")
-#socketio = SocketIO(app)
-#CORS(app)
+CORS(app)
+app.secret_key = 'changethislater'
+
 
 #  Client Keys
 CLIENT_ID = "8457ff0a5bd847ccbb7b04886fd1bdf1"
@@ -40,7 +42,7 @@ PORT = 5000
 REDIRECT_URI = "{}:{}/callback/q".format(CLIENT_SIDE_URL, PORT)
 SCOPE = "user-read-currently-playing"
 STATE = "code"
-SHOW_DIALOG_bool = True
+SHOW_DIALOG_bool = False
 SHOW_DIALOG_str = str(SHOW_DIALOG_bool).lower()
 
 auth_query_parameters = {
@@ -163,28 +165,42 @@ def callback():
     token_type = response_data["token_type"]
     expires_in = response_data["expires_in"]
 
+    session['access_token']=access_token
+
     # Auth Step 6: Use the access token to access Spotify API
     authorization_header = {"Authorization": "Bearer {}".format(access_token)}
 
-    # Get profile data
-    user_profile_api_endpoint = "{}/me".format(SPOTIFY_API_URL)
-    profile_response = requests.get(user_profile_api_endpoint, headers=authorization_header)
-    profile_data = json.loads(profile_response.text)
-
-    # Get user playlist data
-    playlist_api_endpoint = "{}/playlists".format(profile_data["href"])
-    playlists_response = requests.get(playlist_api_endpoint, headers=authorization_header)
-    playlist_data = json.loads(playlists_response.text)
-
-    #playing_api_endpoint = "{}/me/player/currently-playing".format(SPOTIFY_API_URL)
+    # Get Currently Playing Data
     playing_api_endpoint="https://api.spotify.com/v1/me/player/currently-playing"
     playing_response = requests.get(playing_api_endpoint, headers=authorization_header)
     playing_data = json.loads(playing_response.text)
-    print(playing_data)
+    
 
-    # Combine profile and playlist data to display
-    display_arr = [playing_data]
-    return render_template("loggedIn.html", sorted_array=display_arr)
+    return render_template("spotifyRave.html")
+
+@app.route("/callback/currentlyPlaying")
+def currently_playing():
+    auth_token = request.args['code']
+    code_payload = {
+        "grant_type": "authorization_code",
+        "code": str(auth_token),
+        "redirect_uri": REDIRECT_URI,
+        'client_id': CLIENT_ID,
+        'client_secret': CLIENT_SECRET,
+    }
+
+    # Auth Step 6: Use the access token to access Spotify API
+    authorization_header = {"Authorization": "Bearer {}".format(session['access_token'])}
+
+    # Get Currently Playing Data
+    playing_api_endpoint="https://api.spotify.com/v1/me/player/currently-playing"
+    playing_response = requests.get(playing_api_endpoint, headers=authorization_header)
+    playing_data = json.loads(playing_response.text)
+
+    print("pringint data")
+    print(playing_response.text)
+
+    return playing_data
 
 # Redirect 404s to the home page
 @app.errorhandler(404)

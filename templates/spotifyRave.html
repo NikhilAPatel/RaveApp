@@ -1,0 +1,39 @@
+<doctype html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="/static/css/style.css"></link>
+	<title>Rave</title>
+	<link rel="icon" type="image/png" href="/static/img/RaveLogoRRounded.png"/>
+	<script>
+		function currently_playing(){
+			$.ajax({
+				url:"currentlyPlaying",
+				data:{
+					"code": sessionStorage.getItem("code"),
+				},
+				success: function(res){
+                    console.log(res);
+                }
+			})
+		}
+	</script>
+</head>
+<body>
+<div class="container">
+	<input type="button" class="btn btn-primary" value="Get Currently Playing Song" onclick="currently_playing()"/>
+	
+</div>
+<script>
+	window.onload = function() {
+		// Gets the code and stores it for later
+		var code = window.location.href.substring(window.location.href.indexOf("=")+1);
+		sessionStorage.setItem("code", code)
+	};
+</script>
+<body>
+</html>
