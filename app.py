@@ -38,7 +38,7 @@ SPOTIFY_API_URL = "{}/{}".format(SPOTIFY_API_BASE_URL, API_VERSION)
 CLIENT_SIDE_URL = "http://127.0.0.1"
 PORT = 5000
 REDIRECT_URI = "{}:{}/callback/q".format(CLIENT_SIDE_URL, PORT)
-SCOPE = "playlist-modify-public playlist-modify-private"
+SCOPE = "user-read-currently-playing"
 STATE = "code"
 SHOW_DIALOG_bool = True
 SHOW_DIALOG_str = str(SHOW_DIALOG_bool).lower()
@@ -48,7 +48,7 @@ auth_query_parameters = {
     "redirect_uri": REDIRECT_URI,
     "scope": SCOPE,
     # "state": STATE,
-    # "show_dialog": SHOW_DIALOG_str,
+    "show_dialog": SHOW_DIALOG_str,
     "client_id": CLIENT_ID
 }
 
@@ -176,8 +176,14 @@ def callback():
     playlists_response = requests.get(playlist_api_endpoint, headers=authorization_header)
     playlist_data = json.loads(playlists_response.text)
 
+    #playing_api_endpoint = "{}/me/player/currently-playing".format(SPOTIFY_API_URL)
+    playing_api_endpoint="https://api.spotify.com/v1/me/player/currently-playing"
+    playing_response = requests.get(playing_api_endpoint, headers=authorization_header)
+    playing_data = json.loads(playing_response.text)
+    print(playing_data)
+
     # Combine profile and playlist data to display
-    display_arr = [profile_data] + playlist_data["items"]
+    display_arr = [playing_data]
     return render_template("loggedIn.html", sorted_array=display_arr)
 
 # Redirect 404s to the home page
