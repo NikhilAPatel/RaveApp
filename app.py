@@ -120,22 +120,11 @@ def return_currently_playing_id():
 @app.route("/callback/checkNewSong")
 def check_new_song():
     id = request.args.get("id")
+    cur_id = currently_playing_id(session['access_token'])
     room_number = request.args.get("room_number")
-    # Auth Step 6: Use the access token to access Spotify API
-    authorization_header = {
-        "Authorization": "Bearer {}".format(session['access_token'])}
 
-    try:
-        # Get Currently Playing Data
-        playing_api_endpoint = "https://api.spotify.com/v1/me/player/currently-playing"
-        playing_response = requests.get(
-            playing_api_endpoint, headers=authorization_header)
-        playing_data = json.loads(playing_response.text)
-    except:
-        return 0
-
-    if(id != playing_data["item"]["id"]):
-        return {**{"id": playing_data["item"]["id"]}, **ML_room_update(currently_playing(), room_number)}
+    if(id != cur_id):
+        return {**{"id": cur_id}, **ML_room_update(get_features_data(session['access_token']), room_number)}
 
     return {"newSong": False}
 
