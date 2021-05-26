@@ -103,3 +103,5 @@ ENV/
 .idea/
 *.iml
 .DS_Store
+
+secret.py

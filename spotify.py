@@ -2,6 +2,9 @@ import json
 import requests
 from flask import request
 import os
+import importlib
+
+production = True
 
 #  Client Keys
 CLIENT_ID = os.getenv("CLIENT_ID")
@@ -22,6 +25,13 @@ SCOPE = "user-read-currently-playing"
 STATE = "code"
 SHOW_DIALOG_bool = False
 SHOW_DIALOG_str = str(SHOW_DIALOG_bool).lower()
+
+if(not production):
+    secret= importlib.import_module("secret")
+    CLIENT_ID = secret.S_CLIENT_ID
+    CLIENT_SECRET = secret.S_CLIENT_SECRET  
+    CLIENT_SIDE_URL = "http://127.0.0.1"
+    REDIRECT_URI = "{}:{}/callback/q".format(CLIENT_SIDE_URL, PORT)
 
 auth_query_parameters = {
     "response_type": "code",
