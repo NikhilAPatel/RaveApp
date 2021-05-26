@@ -16,7 +16,7 @@ import time
 from datetime import datetime
 import json
 from urllib.parse import quote
-from MLModel import ML_room_create
+from MLModel import ML_get_colors, ML_get_cpm
 
 # TODO hide api keys
 # TODO change and hide secret key
@@ -81,7 +81,7 @@ def create_room():
 
     dt = datetime.now()
 
-    add_room(room_number, cpm, colors[1:].split("#"), dt.microsecond, False)
+    add_room(room_number, cpm, colors[1:].split("#"), dt.microsecond, False, False)
 
     return {
         "room_number": room_number,
@@ -198,8 +198,29 @@ def currently_playing():
     features_response = requests.get(features_api_endpoint, headers=authorization_header)
     features_data = json.loads(features_response.text)
 
-    return ML_room_create(features_data)
+    return ML_room_create(features_data, False)
 
+def ML_room_create(features_data, isUpdate):
+    if(not isUpdate):
+        rooms = get_rooms()
+
+        # Generate room number
+        room_number = randint(0, 1000000)
+        while room_number in rooms.keys():
+            room_number = randint(0, 1000000)
+
+        dt = datetime.now()
+
+        add_room(room_number, ML_get_cpm(features_data), ML_get_colors(features_data)[1:].split("#"), dt.microsecond, False, True)
+        room = get_rooms()[(str)(room_number)]
+        
+        return{
+            "success": True,
+            "colors": room[(str)(room_number)]['colors'],
+            "cpm": room[(str)(room_number)]['cpm'],
+            "created": room[(str)(room_number)]['created'],
+            "version": room[(str)(room_number)]['version']
+        }   
 
 # TODO
 @app.route("/checkupdate")
@@ -227,7 +248,7 @@ def update_room(room_number, value_to_update, new_value):
         obj = json.dump(rooms, my_file)
 
 
-def add_room(room_number, cpm, colors, created, dead):
+def add_room(room_number, cpm, colors, created, dead, spotify_room):
     newRoom = {
         room_number: {
             'cpm': cpm,
@@ -235,7 +256,8 @@ def add_room(room_number, cpm, colors, created, dead):
             'created': created,
             'dead': dead,
             'version': 0,
-            'room_number': room_number
+            'room_number': room_number,
+            'spotify_room': spotify_room
         }
     }
 

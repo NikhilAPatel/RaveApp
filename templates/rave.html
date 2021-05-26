@@ -36,7 +36,7 @@
             })
         }
         async function dorave(colors, cpm, created){
-            ajaxupdater();
+            //ajaxupdater();
             while(true){
                 duration = (60/cpm)*1000
                 currentdate = new Date();
@@ -51,7 +51,7 @@
             
         }
 
-        function ajaxupdater(){
+        {% comment %} function ajaxupdater(){
             $.ajax({
                 url:"checkupdate",
                 success: function(res){
@@ -59,7 +59,7 @@
                     ajaxupdater();
                 }
             })
-        }
+        } {% endcomment %}
 
         function endRave(){
             location.replace("/");
