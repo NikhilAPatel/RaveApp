@@ -11,7 +11,6 @@ from flask_socketio import (SocketIO, join_room, leave_room)
 from random import(seed, randint)
 from room import *
 import threading
-import requests
 import time
 from datetime import datetime
 import json
