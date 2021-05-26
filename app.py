@@ -60,7 +60,7 @@ def create_room():
 @app.route('/rave')
 def start_rave():
     room_number = request.args.get("room_number")
-    return return_room(room_number)
+    return return_room(room_number, False)
     
 
 @app.route('/joinRoom')
@@ -133,26 +133,14 @@ def ML_room_create(features_data):
     rooms = get_rooms()
 
     # Generate room number
-    room_number = (str)(randint(0, 1000000))
-    while room_number in rooms.keys():
-        room_number = (str)(randint(0, 1000000))
+    room_number = generate_room_number()
 
     dt = datetime.now()
 
     add_room(room_number, ML_get_cpm(features_data), ML_get_colors(
         features_data)[1:], dt.microsecond, False, True)
     room = get_rooms()[(str)(room_number)]
-
-    return{
-        "success": True,
-        "room_number": room_number,
-        "colors": room[(str)(room_number)]['colors'],
-        "cpm": room[(str)(room_number)]['cpm'],
-        "created": room[(str)(room_number)]['created'],
-        "version": room[(str)(room_number)]['version'],
-        "room_number": (str)(room_number),
-        "spotify_room": room[room_number]['spotify_room']
-    }
+    return return_room(room_number, False)
 
 
 def ML_room_update(features_data, room_number):
@@ -160,16 +148,7 @@ def ML_room_update(features_data, room_number):
     update_room(room_number, ML_get_colors(
         features_data), ML_get_cpm(features_data))
     room = get_rooms()[(str)(room_number)]
-    return{
-        "success": True,
-        "newSong": True,
-        "room_number": room_number,
-        "colors": room[(str)(room_number)]['colors'],
-        "cpm": room[(str)(room_number)]['cpm'],
-        "created": room[(str)(room_number)]['created'],
-        "version": room[(str)(room_number)]['version'],
-        "spotify_room": room[room_number]['spotify_room']
-    }
+    return return_room(room_number, True)
 
 
 @app.route("/updateRoom")
@@ -177,34 +156,12 @@ def updateRoom():
     room_number = request.args.get("room_number")
     rooms = get_rooms()
     room = rooms[room_number]
-    return{
-        "success": True,
-        "newSong": True,
-        "room_number": room_number,
-        "colors": room[(str)(room_number)]['colors'],
-        "cpm": room[(str)(room_number)]['cpm'],
-        "created": room[(str)(room_number)]['created'],
-        "version": room[(str)(room_number)]['version'],
-        "spotify_room": room[room_number]['spotify_room']
-    }
-
-# TODO
-
-
-@app.route("/checkupdate")
-def checkupdate():
-    return {
-        "update": False
-    }
+    return return_room(room_number, True)
 
 # Redirect 404s to the home page
-
-
 @app.errorhandler(404)
 def fourOfour(request):
     return render_template('index.html')
-
-
 
 
 # If we're running in stand alone mode, run the application

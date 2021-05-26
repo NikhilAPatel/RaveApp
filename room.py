@@ -18,9 +18,9 @@ class Room:
 
 def generate_room_number():
     rooms = get_rooms()
-    room_number = (str)(random.randint(0, 1000000))
+    room_number = (str)(random.randint(100000, 999999))
     while room_number in rooms.keys():
-        room_number = (str)(random.randint(0, 1000000))
+        room_number = (str)(random.randint(100000, 999999))
     
     return room_number
 
@@ -59,7 +59,7 @@ def add_room(room_number, cpm, colors, created, dead, spotify_room):
     with open("rooms.txt", "w") as my_file:
         obj = json.dump(rooms, my_file)
 
-def return_room(room_number):
+def return_room(room_number, new_song):
     room = None
     rooms = get_rooms()
     try:
@@ -79,6 +79,7 @@ def return_room(room_number):
 
     return{
         "success": True,
+        "newSong": new_song,
         "room_number": room_number,
         "colors": room[room_number]['colors'],
         "cpm": room[room_number]['cpm'],
