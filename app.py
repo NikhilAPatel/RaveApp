@@ -18,6 +18,7 @@ import json
 from urllib.parse import quote
 
 # TODO hide api keys
+# TODO change and hide secret key
 
 # Create the application instance
 app = Flask(__name__, template_folder="templates")
@@ -167,28 +168,11 @@ def callback():
 
     session['access_token']=access_token
 
-    # Auth Step 6: Use the access token to access Spotify API
-    authorization_header = {"Authorization": "Bearer {}".format(access_token)}
-
-    # Get Currently Playing Data
-    playing_api_endpoint="https://api.spotify.com/v1/me/player/currently-playing"
-    playing_response = requests.get(playing_api_endpoint, headers=authorization_header)
-    playing_data = json.loads(playing_response.text)
-    
-
     return render_template("spotifyRave.html")
 
+#TODO see if we need to pass the code in as a parameter
 @app.route("/callback/currentlyPlaying")
 def currently_playing():
-    auth_token = request.args['code']
-    code_payload = {
-        "grant_type": "authorization_code",
-        "code": str(auth_token),
-        "redirect_uri": REDIRECT_URI,
-        'client_id': CLIENT_ID,
-        'client_secret': CLIENT_SECRET,
-    }
-
     # Auth Step 6: Use the access token to access Spotify API
     authorization_header = {"Authorization": "Bearer {}".format(session['access_token'])}
 
@@ -197,10 +181,13 @@ def currently_playing():
     playing_response = requests.get(playing_api_endpoint, headers=authorization_header)
     playing_data = json.loads(playing_response.text)
 
-    print("pringint data")
-    print(playing_response.text)
+    id=playing_data["item"]["id"]
+    # Get Currently Playing Song Features
+    features_api_endpoint="https://api.spotify.com/v1/audio-features/"+id
+    features_response = requests.get(features_api_endpoint, headers=authorization_header)
+    features_data = json.loads(features_response.text)
 
-    return playing_data
+    return features_data
 
 # Redirect 404s to the home page
 @app.errorhandler(404)

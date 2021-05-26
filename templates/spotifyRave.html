@@ -17,8 +17,22 @@
 					"code": sessionStorage.getItem("code"),
 				},
 				success: function(res){
-                    console.log(res);
+					console.log(res)
+                    //$("#curplay").html("Currently Playing "+res.item.name)
+					//song_rave(features);
                 }
+			})
+		}
+
+		function song_rave(features){
+			$.ajax({
+				url:"songRave",
+				data:{
+					"features": features
+				},
+				success: function(res){
+					console.log(res);
+				}
 			})
 		}
 	</script>
@@ -26,13 +40,15 @@
 <body>
 <div class="container">
 	<input type="button" class="btn btn-primary" value="Get Currently Playing Song" onclick="currently_playing()"/>
-	
+	<br/>
+	<text id="curplay"></text>
 </div>
 <script>
 	window.onload = function() {
 		// Gets the code and stores it for later
 		var code = window.location.href.substring(window.location.href.indexOf("=")+1);
 		sessionStorage.setItem("code", code)
+		currently_playing();
 	};
 </script>
 <body>
