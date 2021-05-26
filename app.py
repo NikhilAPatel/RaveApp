@@ -24,6 +24,7 @@ from MLModel import ML_get_colors, ML_get_cpm
 # TODO maybe give each room a version number, so clients can tell when the room parameters have been updated
 # TODO use duration_ms and progress_ms (returned from get currently playing api call) to figure out when we have to send another request for a new song
 # TODO if user tries to start a spotify rave but isn't playing any music, put up a splash page or something to tell them to start
+# TODO joining a spotify rave does not work
 
 # Create the application instance
 app = Flask(__name__, template_folder="templates")

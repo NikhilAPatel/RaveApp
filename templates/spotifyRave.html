@@ -6,6 +6,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+	<script src="/static/js/instructions.js"></script>
 	<link rel="stylesheet" type="text/css" href="/static/css/style.css"></link>
 	<title>Rave</title>
 	<link rel="icon" type="image/png" href="/static/img/RaveLogoRRounded.png"/>
@@ -17,6 +18,7 @@
 					console.log(res)
 					sessionStorage.setItem("id", res.id)
 					sessionStorage.setItem("room_number", res.room_number)
+					$("#roomNumber").html("&nbspRoom Number: "+res.room_number);
 					sessionStorage.setItem("colors", res.colors);
 					sessionStorage.setItem("cpm", res.cpm);
 					sessionStorage.setItem("created", res.created);
@@ -67,15 +69,28 @@
 </head>
 <body>
 <div class="container">
-	<input type="button" class="btn btn-primary" value="Get Currently Playing Song" onclick="currently_playing()"/>
-	<br/>
-	<text id="curplay"></text>
+	<div id="instructions" class="dropdown">
+        <text id="roomNumber"></text>
+        <text> | Press Spacebar To Toggle This Block &nbsp</text> 
+        <br/>
+        <input type="button" class="btn btn-info" value="Copy Invite Link" onclick="copylink()"/>
+        <input type="button" class="btn btn-danger" value="End Rave" onclick="endRave()"/>
+    </div>
 </div>
 <script>
 	window.onload = function() {
 		// Starts the rave
 		start_spotify_rave();
 	};
+	document.addEventListener('keyup', event => {
+            if (event.code === 'Space') {
+                if(sessionStorage.getItem("hidden")=="true"){
+                    unhide_instructions();    
+                }else{
+                    hide_instructions();
+                }
+            }
+        })
 </script>
 <body>
 </html>

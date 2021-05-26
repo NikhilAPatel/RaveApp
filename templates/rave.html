@@ -6,6 +6,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="/static/js/instructions.js"></script>
     <link rel="stylesheet" type="text/css" href="/static/css/style.css"></link>
     <script type="text/javascript" charset="utf-8">
         function init(){
@@ -60,29 +61,6 @@
         //        }
         //    })
         //}
-
-        function endRave(){
-            location.replace("/");
-        }
-
-        function hide_instructions(){
-            $("#instructions").hide();
-            sessionStorage.setItem("hidden", "true");
-        }
-
-        function unhide_instructions(){
-            $("#instructions").show();
-            sessionStorage.setItem("hidden", "false");
-        }
-
-        function copylink(){
-            const el = document.createElement('textarea');
-            el.value = "https://ravebynikhil.herokuapp.com/"+sessionStorage.getItem('room_number');
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-        }
 
     </script>
     <link rel="stylesheet" type="text/css" href="/static/css/style.css"></link>
