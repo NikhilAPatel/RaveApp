@@ -140,7 +140,9 @@ def ML_room_create(features_data):
     add_room(room_number, ML_get_cpm(features_data), ML_get_colors(
         features_data)[1:], dt.microsecond, False, True)
     room = get_rooms()[(str)(room_number)]
+
     return return_room(room_number, False)
+
 
 
 def ML_room_update(features_data, room_number):

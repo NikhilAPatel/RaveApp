@@ -1,10 +1,11 @@
 import json
 import requests
 from flask import request
+import os
 
 #  Client Keys
-CLIENT_ID = "8457ff0a5bd847ccbb7b04886fd1bdf1"
-CLIENT_SECRET = "85a731c048a34a97ba78b1937193057a"
+CLIENT_ID = os.getenv("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 
 # Spotify URLS
 SPOTIFY_AUTH_URL = "https://accounts.spotify.com/authorize"
