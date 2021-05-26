@@ -16,9 +16,14 @@ import time
 from datetime import datetime
 import json
 from urllib.parse import quote
+from MLModel import ML_room_create
 
 # TODO hide api keys
 # TODO change and hide secret key
+# TODO modify the normal rave so that is continously calls ajax requests (make sure they are not blocking) to see if the room parameters have changed
+# TODO maybe give each room a version number, so clients can tell when the room parameters have been updated
+# TODO use duration_ms and progress_ms (returned from get currently playing api call) to figure out when we have to send another request for a new song
+# TODO if user tries to start a spotify rave but isn't playing any music, put up a splash page or something to tell them to start
 
 # Create the application instance
 app = Flask(__name__, template_folder="templates")
@@ -109,7 +114,8 @@ def start_rave():
         "success": True,
         "colors": room[room_number]['colors'],
         "cpm": room[room_number]['cpm'],
-        "created": room[room_number]['created']
+        "created": room[room_number]['created'],
+        "version": room[room_number]['version']
     }
 
 
@@ -170,16 +176,21 @@ def callback():
 
     return render_template("spotifyRave.html")
 
-#TODO see if we need to pass the code in as a parameter
 @app.route("/callback/currentlyPlaying")
 def currently_playing():
     # Auth Step 6: Use the access token to access Spotify API
     authorization_header = {"Authorization": "Bearer {}".format(session['access_token'])}
 
-    # Get Currently Playing Data
-    playing_api_endpoint="https://api.spotify.com/v1/me/player/currently-playing"
-    playing_response = requests.get(playing_api_endpoint, headers=authorization_header)
-    playing_data = json.loads(playing_response.text)
+    try:
+        # Get Currently Playing Data
+        playing_api_endpoint="https://api.spotify.com/v1/me/player/currently-playing"
+        playing_response = requests.get(playing_api_endpoint, headers=authorization_header)
+        playing_data = json.loads(playing_response.text)
+    except:
+        return {
+            "error": True,
+            "message": "Not currently playing a song"
+        }
 
     id=playing_data["item"]["id"]
     # Get Currently Playing Song Features
@@ -187,7 +198,15 @@ def currently_playing():
     features_response = requests.get(features_api_endpoint, headers=authorization_header)
     features_data = json.loads(features_response.text)
 
-    return features_data
+    return ML_room_create(features_data)
+
+
+# TODO
+@app.route("/checkupdate")
+def checkupdate():
+    return {
+        "update": False
+    }
 
 # Redirect 404s to the home page
 @app.errorhandler(404)
@@ -201,6 +220,12 @@ def get_rooms():
 
     return rooms
 
+def update_room(room_number, value_to_update, new_value):
+    rooms = get_rooms()
+    rooms[room_number][value_to_update]=new_value
+    with open("rooms.txt", "w") as my_file:
+        obj = json.dump(rooms, my_file)
+
 
 def add_room(room_number, cpm, colors, created, dead):
     newRoom = {
@@ -209,6 +234,7 @@ def add_room(room_number, cpm, colors, created, dead):
             'colors': colors,
             'created': created,
             'dead': dead,
+            'version': 0,
             'room_number': room_number
         }
     }

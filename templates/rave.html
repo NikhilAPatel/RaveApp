@@ -24,6 +24,7 @@
                     "room_number":  room_number
                 },
                 success: function(res){
+                    console.log(res)
                     if(!res.success){
                         location.replace("/");
                         return;
@@ -35,6 +36,7 @@
             })
         }
         async function dorave(colors, cpm, created){
+            ajaxupdater();
             while(true){
                 duration = (60/cpm)*1000
                 currentdate = new Date();
@@ -47,6 +49,16 @@
                 await new Promise(r => setTimeout(r, 1));
             }
             
+        }
+
+        function ajaxupdater(){
+            $.ajax({
+                url:"checkupdate",
+                success: function(res){
+                    //console.log(res);
+                    ajaxupdater();
+                }
+            })
         }
 
         function endRave(){
