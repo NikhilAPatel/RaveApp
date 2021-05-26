@@ -10,28 +10,56 @@
 	<title>Rave</title>
 	<link rel="icon" type="image/png" href="/static/img/RaveLogoRRounded.png"/>
 	<script>
-		function currently_playing(){
+		function start_spotify_rave(){
 			$.ajax({
-				url:"currentlyPlaying",
-				data:{
-					"code": sessionStorage.getItem("code"),
-				},
+				url:"startSpotifyRave",
 				success: function(res){
 					console.log(res)
-                    //$("#curplay").html("Currently Playing "+res.item.name)
-					//song_rave(features);
+					sessionStorage.setItem("id", res.id)
+					sessionStorage.setItem("room_number", res.room_number)
+					sessionStorage.setItem("colors", res.colors);
+					sessionStorage.setItem("cpm", res.cpm);
+					sessionStorage.setItem("created", res.created);
+					doRave();
                 }
 			})
 		}
 
-		function song_rave(features){
+		async function doRave(){
+			ajaxupdater();
+			while(true){
+				var cpm = sessionStorage.getItem("cpm");
+				var colors = sessionStorage.getItem("colors").split(",");
+				var created = sessionStorage.getItem("created")
+                duration = (60/cpm)*1000
+                currentdate = new Date();
+                time_passed = currentdate-created;
+                //Determine what color it should be right now
+                index = time_passed%(duration*colors.length)
+                index = parseInt(index/duration)
+                document.body.style.background="#"+colors[index];
+
+                await new Promise(r => setTimeout(r, 1));
+            }
+		}
+
+		async function ajaxupdater(){
+			await new Promise(r => setTimeout(r, 3000));
 			$.ajax({
-				url:"songRave",
+				url:"checkNewSong",
 				data:{
-					"features": features
+					"id": sessionStorage.getItem("id"),
+					"room_number": sessionStorage.getItem("room_number")
 				},
 				success: function(res){
 					console.log(res);
+					if(res.newSong){
+						sessionStorage.setItem("colors", res.colors);
+						sessionStorage.setItem("cpm", res.cpm);
+						sessionStorage.setItem("id", res.id);
+						sessionStorage.setItem("created", res.created);
+					}
+					ajaxupdater();
 				}
 			})
 		}
@@ -45,10 +73,8 @@
 </div>
 <script>
 	window.onload = function() {
-		// Gets the code and stores it for later
-		var code = window.location.href.substring(window.location.href.indexOf("=")+1);
-		sessionStorage.setItem("code", code)
-		currently_playing();
+		// Starts the rave
+		start_spotify_rave();
 	};
 </script>
 <body>

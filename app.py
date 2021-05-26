@@ -176,8 +176,25 @@ def callback():
 
     return render_template("spotifyRave.html")
 
-@app.route("/callback/currentlyPlaying")
+@app.route("/callback/startSpotifyRave")
 def currently_playing():
+    id=currently_playing_id()
+    authorization_header = {"Authorization": "Bearer {}".format(session['access_token'])}
+   
+    if id==0:
+        return {
+            "error": True,
+            "message": "Not currently playing a song"
+        }
+    # Get Currently Playing Song Features
+    features_api_endpoint="https://api.spotify.com/v1/audio-features/"+id
+    features_response = requests.get(features_api_endpoint, headers=authorization_header)
+    features_data = json.loads(features_response.text)
+
+    return {**{"id":id}, **ML_room_create(features_data)}
+
+@app.route("/callback/currentlyPlayingId")
+def currently_playing_id():
     # Auth Step 6: Use the access token to access Spotify API
     authorization_header = {"Authorization": "Bearer {}".format(session['access_token'])}
 
@@ -187,18 +204,29 @@ def currently_playing():
         playing_response = requests.get(playing_api_endpoint, headers=authorization_header)
         playing_data = json.loads(playing_response.text)
     except:
-        return {
-            "error": True,
-            "message": "Not currently playing a song"
-        }
+        return 0
+    
+    return playing_data["item"]["id"]
 
-    id=playing_data["item"]["id"]
-    # Get Currently Playing Song Features
-    features_api_endpoint="https://api.spotify.com/v1/audio-features/"+id
-    features_response = requests.get(features_api_endpoint, headers=authorization_header)
-    features_data = json.loads(features_response.text)
+@app.route("/callback/checkNewSong")
+def check_new_song():
+    id = request.args.get("id")
+    room_number = request.args.get("room_number")
+    # Auth Step 6: Use the access token to access Spotify API
+    authorization_header = {"Authorization": "Bearer {}".format(session['access_token'])}
 
-    return ML_room_create(features_data, False)
+    try:
+        # Get Currently Playing Data
+        playing_api_endpoint="https://api.spotify.com/v1/me/player/currently-playing"
+        playing_response = requests.get(playing_api_endpoint, headers=authorization_header)
+        playing_data = json.loads(playing_response.text)
+    except:
+        return 0
+    
+    if(id!=playing_data["item"]["id"]):
+        return {**{"id": playing_data["item"]["id"]}, **ML_room_update(currently_playing(), room_number)}
+    
+    return {"newSong": False}
 
 def ML_room_create(features_data):
     rooms = get_rooms()
@@ -218,7 +246,8 @@ def ML_room_create(features_data):
         "colors": room[(str)(room_number)]['colors'],
         "cpm": room[(str)(room_number)]['cpm'],
         "created": room[(str)(room_number)]['created'],
-        "version": room[(str)(room_number)]['version']
+        "version": room[(str)(room_number)]['version'],
+        "room_number": (str)(room_number)
     }
 
 def ML_room_update(features_data, room_number):
@@ -227,6 +256,7 @@ def ML_room_update(features_data, room_number):
     room = get_rooms()[(str)(room_number)]
     return{
         "success": True,
+        "newSong": True,
         "colors": room[(str)(room_number)]['colors'],
         "cpm": room[(str)(room_number)]['cpm'],
         "created": room[(str)(room_number)]['created'],
@@ -254,9 +284,9 @@ def get_rooms():
 
 def update_room(room_number, new_colors, new_cpm):
     rooms = get_rooms()
-    rooms[room_number]["colors"]=new_colors
-    rooms[room_number]["cpm"]=new_cpm
-    rooms[room_number]["version"]=rooms[room_number]["version"]+1
+    rooms[room_number][room_number]["colors"]=new_colors
+    rooms[room_number][room_number]["cpm"]=new_cpm
+    rooms[room_number][room_number]["version"]=rooms[room_number][room_number]["version"]+1
     with open("rooms.txt", "w") as my_file:
         obj = json.dump(rooms, my_file)
 
