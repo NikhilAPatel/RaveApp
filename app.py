@@ -25,6 +25,10 @@ from MLModel import ML_get_colors, ML_get_cpm
 # TODO use duration_ms and progress_ms (returned from get currently playing api call) to figure out when we have to send another request for a new song
 # TODO if user tries to start a spotify rave but isn't playing any music, put up a splash page or something to tell them to start
 # TODO joining a spotify rave does not work
+# TODO make rave js code the same and abstract to file
+# TODO make function for returning all of a rooms attributes (in JSON)
+# TODO if a room code is less than 6 characters then you'll get a key error when searching for it
+# TODO see if the Room class is still needed
 
 # Create the application instance
 app = Flask(__name__, template_folder="templates")
@@ -76,9 +80,9 @@ def create_room():
     rooms = get_rooms()
 
     # Generate room number
-    room_number = randint(0, 1000000)
+    room_number = (str)(randint(0, 1000000))
     while room_number in rooms.keys():
-        room_number = randint(0, 1000000)
+        room_number = (str)(randint(0, 1000000))
 
     dt = datetime.now()
 
@@ -113,10 +117,12 @@ def start_rave():
 
     return{
         "success": True,
+        "room_number": room_number,
         "colors": room[room_number]['colors'],
         "cpm": room[room_number]['cpm'],
         "created": room[room_number]['created'],
-        "version": room[room_number]['version']
+        "version": room[room_number]['version'],
+        "spotify_room": room[room_number]['spotify_room']
     }
 
 
@@ -239,16 +245,18 @@ def ML_room_create(features_data):
 
     dt = datetime.now()
 
-    add_room(room_number, ML_get_cpm(features_data), ML_get_colors(features_data)[1:].split("#"), dt.microsecond, False, True)
+    add_room(room_number, ML_get_cpm(features_data), ML_get_colors(features_data)[1:], dt.microsecond, False, True)
     room = get_rooms()[(str)(room_number)]
     
     return{
         "success": True,
+        "room_number": room_number,
         "colors": room[(str)(room_number)]['colors'],
         "cpm": room[(str)(room_number)]['cpm'],
         "created": room[(str)(room_number)]['created'],
         "version": room[(str)(room_number)]['version'],
-        "room_number": (str)(room_number)
+        "room_number": (str)(room_number),
+        "spotify_room": room[room_number]['spotify_room']
     }
 
 def ML_room_update(features_data, room_number):
@@ -258,10 +266,28 @@ def ML_room_update(features_data, room_number):
     return{
         "success": True,
         "newSong": True,
+        "room_number": room_number,
         "colors": room[(str)(room_number)]['colors'],
         "cpm": room[(str)(room_number)]['cpm'],
         "created": room[(str)(room_number)]['created'],
-        "version": room[(str)(room_number)]['version']
+        "version": room[(str)(room_number)]['version'],
+        "spotify_room": room[room_number]['spotify_room']
+    }
+
+@app.route("/updateRoom")
+def updateRoom():
+    room_number = request.args.get("room_number")
+    rooms = get_rooms()
+    room = rooms[room_number]
+    return{
+        "success": True,
+        "newSong": True,
+        "room_number": room_number,
+        "colors": room[(str)(room_number)]['colors'],
+        "cpm": room[(str)(room_number)]['cpm'],
+        "created": room[(str)(room_number)]['created'],
+        "version": room[(str)(room_number)]['version'],
+        "spotify_room": room[room_number]['spotify_room']
     }
 
 # TODO

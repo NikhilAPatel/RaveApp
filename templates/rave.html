@@ -7,6 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script src="/static/js/instructions.js"></script>
+    <script src="/static/js/rave.js"></script>
     <link rel="stylesheet" type="text/css" href="/static/css/style.css"></link>
     <script type="text/javascript" charset="utf-8">
         function init(){
@@ -17,52 +18,21 @@
             $("#roomNumber").html("&nbspRoom Number: "+url);
             rave(url);
         }
-
-        async function rave(room_number){
+        async function ajaxupdater(){
+            await new Promise(r => setTimeout(r, 3000));
             $.ajax({
-                url:"rave",
+                url:"updateRoom",
                 data:{
-                    "room_number":  room_number
+                    "room_number": sessionStorage.getItem("room_number"),
                 },
                 success: function(res){
-                    console.log(res)
-                    if(!res.success){
-                        location.replace("/");
-                        return;
+                    if(res.version>sessionStorage.getItem("version")){
+                        updateSessionStorage(res);
                     }
-                    
-                    // Do the raving
-                    dorave(res.colors, res.cpm, res.created)
+                    ajaxupdater();
                 }
             })
         }
-        async function dorave(colors, cpm, created){
-            //ajaxupdater();
-            while(true){
-                console.log("doing rave")
-                duration = (60/cpm)*1000
-                currentdate = new Date();
-                time_passed = currentdate-created;
-                //Determine what color it should be right now
-                index = time_passed%(duration*colors.length)
-                index = parseInt(index/duration)
-                document.body.style.background="#"+colors[index];
-
-                await new Promise(r => setTimeout(r, 1));
-            }
-            
-        }
-
-        //function ajaxupdater(){
-        //    $.ajax({
-        //        url:"checkupdate",
-        //        success: function(res){
-        //            //console.log(res);
-        //            ajaxupdater();
-        //        }
-        //    })
-        //}
-
     </script>
     <link rel="stylesheet" type="text/css" href="/static/css/style.css"></link>
     <title>Rave</title>

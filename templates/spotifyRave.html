@@ -7,44 +7,11 @@
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 	<script src="/static/js/instructions.js"></script>
+	<script src="/static/js/rave.js"></script>
 	<link rel="stylesheet" type="text/css" href="/static/css/style.css"></link>
 	<title>Rave</title>
 	<link rel="icon" type="image/png" href="/static/img/RaveLogoRRounded.png"/>
 	<script>
-		function start_spotify_rave(){
-			$.ajax({
-				url:"startSpotifyRave",
-				success: function(res){
-					console.log(res)
-					sessionStorage.setItem("id", res.id)
-					sessionStorage.setItem("room_number", res.room_number)
-					$("#roomNumber").html("&nbspRoom Number: "+res.room_number);
-					sessionStorage.setItem("colors", res.colors);
-					sessionStorage.setItem("cpm", res.cpm);
-					sessionStorage.setItem("created", res.created);
-					doRave();
-                }
-			})
-		}
-
-		async function doRave(){
-			ajaxupdater();
-			while(true){
-				var cpm = sessionStorage.getItem("cpm");
-				var colors = sessionStorage.getItem("colors").split(",");
-				var created = sessionStorage.getItem("created")
-                duration = (60/cpm)*1000
-                currentdate = new Date();
-                time_passed = currentdate-created;
-                //Determine what color it should be right now
-                index = time_passed%(duration*colors.length)
-                index = parseInt(index/duration)
-                document.body.style.background="#"+colors[index];
-
-                await new Promise(r => setTimeout(r, 1));
-            }
-		}
-
 		async function ajaxupdater(){
 			await new Promise(r => setTimeout(r, 3000));
 			$.ajax({
@@ -54,15 +21,11 @@
 					"room_number": sessionStorage.getItem("room_number")
 				},
 				success: function(res){
-					console.log(res);
 					if(res.newSong){
-						sessionStorage.setItem("colors", res.colors);
-						sessionStorage.setItem("cpm", res.cpm);
-						sessionStorage.setItem("id", res.id);
-						sessionStorage.setItem("created", res.created);
+						updateSessionStorage(res);
 					}
 					ajaxupdater();
-				}
+					}
 			})
 		}
 	</script>
