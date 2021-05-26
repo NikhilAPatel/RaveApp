@@ -200,27 +200,38 @@ def currently_playing():
 
     return ML_room_create(features_data, False)
 
-def ML_room_create(features_data, isUpdate):
-    if(not isUpdate):
-        rooms = get_rooms()
+def ML_room_create(features_data):
+    rooms = get_rooms()
 
-        # Generate room number
+    # Generate room number
+    room_number = randint(0, 1000000)
+    while room_number in rooms.keys():
         room_number = randint(0, 1000000)
-        while room_number in rooms.keys():
-            room_number = randint(0, 1000000)
 
-        dt = datetime.now()
+    dt = datetime.now()
 
-        add_room(room_number, ML_get_cpm(features_data), ML_get_colors(features_data)[1:].split("#"), dt.microsecond, False, True)
-        room = get_rooms()[(str)(room_number)]
-        
-        return{
-            "success": True,
-            "colors": room[(str)(room_number)]['colors'],
-            "cpm": room[(str)(room_number)]['cpm'],
-            "created": room[(str)(room_number)]['created'],
-            "version": room[(str)(room_number)]['version']
-        }   
+    add_room(room_number, ML_get_cpm(features_data), ML_get_colors(features_data)[1:].split("#"), dt.microsecond, False, True)
+    room = get_rooms()[(str)(room_number)]
+    
+    return{
+        "success": True,
+        "colors": room[(str)(room_number)]['colors'],
+        "cpm": room[(str)(room_number)]['cpm'],
+        "created": room[(str)(room_number)]['created'],
+        "version": room[(str)(room_number)]['version']
+    }
+
+def ML_room_update(features_data, room_number):
+    rooms = get_rooms()
+    update_room(room_number, ML_get_colors(features_data), ML_get_cpm(features_data))
+    room = get_rooms()[(str)(room_number)]
+    return{
+        "success": True,
+        "colors": room[(str)(room_number)]['colors'],
+        "cpm": room[(str)(room_number)]['cpm'],
+        "created": room[(str)(room_number)]['created'],
+        "version": room[(str)(room_number)]['version']
+    }
 
 # TODO
 @app.route("/checkupdate")
@@ -241,9 +252,11 @@ def get_rooms():
 
     return rooms
 
-def update_room(room_number, value_to_update, new_value):
+def update_room(room_number, new_colors, new_cpm):
     rooms = get_rooms()
-    rooms[room_number][value_to_update]=new_value
+    rooms[room_number]["colors"]=new_colors
+    rooms[room_number]["cpm"]=new_cpm
+    rooms[room_number]["version"]=rooms[room_number]["version"]+1
     with open("rooms.txt", "w") as my_file:
         obj = json.dump(rooms, my_file)
 
