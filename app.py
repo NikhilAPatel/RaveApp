@@ -28,6 +28,7 @@ from spotify import *
 # TODO make function for creating a unique room number
 # TODO move all room related functions to a new file
 # TODO move all the spotify variables to a new function
+# TODO change the spotify callback so they go to the normal rave url "ravebynikhil.herokuapp.com/<room_number>"
 
 # Create the application instance
 app = Flask(__name__, template_folder="templates")
@@ -59,35 +60,8 @@ def create_room():
 @app.route('/rave')
 def start_rave():
     room_number = request.args.get("room_number")
-    room = None
-    rooms = get_rooms()
-
-    # If this room does not exist, let the client know
-    try:
-        room = rooms[room_number]
-    except(KeyError):
-        return{
-            "success": False,
-            "room_number": room_number,
-            "error": "value error"
-        }
-
-    except(ValueError):
-        return{
-            "success": False,
-            "error": "value error"
-        }
-
-    return{
-        "success": True,
-        "room_number": room_number,
-        "colors": room[room_number]['colors'],
-        "cpm": room[room_number]['cpm'],
-        "created": room[room_number]['created'],
-        "version": room[room_number]['version'],
-        "spotify_room": room[room_number]['spotify_room']
-    }
-
+    return return_room(room_number)
+    
 
 @app.route('/joinRoom')
 def join_rave():
@@ -127,65 +101,20 @@ def login():
 
 @app.route("/callback/q")
 def callback():
-    # Auth Step 4: Requests refresh and access tokens
-    auth_token = request.args['code']
-    code_payload = {
-        "grant_type": "authorization_code",
-        "code": str(auth_token),
-        "redirect_uri": REDIRECT_URI,
-        'client_id': CLIENT_ID,
-        'client_secret': CLIENT_SECRET,
-    }
-    post_request = requests.post(SPOTIFY_TOKEN_URL, data=code_payload)
-
-    # Auth Step 5: Tokens are Returned to Application
-    response_data = json.loads(post_request.text)
-    access_token = response_data["access_token"]
-    refresh_token = response_data["refresh_token"]
-    token_type = response_data["token_type"]
-    expires_in = response_data["expires_in"]
-
-    session['access_token'] = access_token
-
+    session['access_token'] = spotify_login(request.args['code'])
     return render_template("spotifyRave.html")
 
 
 @app.route("/callback/startSpotifyRave")
 def currently_playing():
-    id = currently_playing_id()
-    authorization_header = {
-        "Authorization": "Bearer {}".format(session['access_token'])}
-
-    if id == 0:
-        return {
-            "error": True,
-            "message": "Not currently playing a song"
-        }
-    # Get Currently Playing Song Features
-    features_api_endpoint = "https://api.spotify.com/v1/audio-features/"+id
-    features_response = requests.get(
-        features_api_endpoint, headers=authorization_header)
-    features_data = json.loads(features_response.text)
-
+    features_data = get_features_data(session['access_token'])
+    id=currently_playing_id(session['access_token'])
     return {**{"id": id}, **ML_room_create(features_data)}
 
 
 @app.route("/callback/currentlyPlayingId")
-def currently_playing_id():
-    # Auth Step 6: Use the access token to access Spotify API
-    authorization_header = {
-        "Authorization": "Bearer {}".format(session['access_token'])}
-
-    try:
-        # Get Currently Playing Data
-        playing_api_endpoint = "https://api.spotify.com/v1/me/player/currently-playing"
-        playing_response = requests.get(
-            playing_api_endpoint, headers=authorization_header)
-        playing_data = json.loads(playing_response.text)
-    except:
-        return 0
-
-    return playing_data["item"]["id"]
+def return_currently_playing_id():
+    return currently_playing_id(session['access_token'])
 
 
 @app.route("/callback/checkNewSong")

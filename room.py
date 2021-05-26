@@ -58,3 +58,31 @@ def add_room(room_number, cpm, colors, created, dead, spotify_room):
 
     with open("rooms.txt", "w") as my_file:
         obj = json.dump(rooms, my_file)
+
+def return_room(room_number):
+    room = None
+    rooms = get_rooms()
+    try:
+        room = rooms[room_number]
+    except(KeyError):
+        return{
+            "success": False,
+            "room_number": room_number,
+            "error": "value error"
+        }
+
+    except(ValueError):
+        return{
+            "success": False,
+            "error": "value error"
+        }
+
+    return{
+        "success": True,
+        "room_number": room_number,
+        "colors": room[room_number]['colors'],
+        "cpm": room[room_number]['cpm'],
+        "created": room[room_number]['created'],
+        "version": room[room_number]['version'],
+        "spotify_room": room[room_number]['spotify_room']
+    }

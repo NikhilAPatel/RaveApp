@@ -1,3 +1,7 @@
+import json
+import requests
+from flask import request
+
 #  Client Keys
 CLIENT_ID = "8457ff0a5bd847ccbb7b04886fd1bdf1"
 CLIENT_SECRET = "85a731c048a34a97ba78b1937193057a"
@@ -26,3 +30,53 @@ auth_query_parameters = {
     "show_dialog": SHOW_DIALOG_str,
     "client_id": CLIENT_ID
 }
+
+def spotify_login(code):
+    # Auth Step 4: Requests refresh and access tokens
+    auth_token = code
+    code_payload = {
+        "grant_type": "authorization_code",
+        "code": str(auth_token),
+        "redirect_uri": REDIRECT_URI,
+        'client_id': CLIENT_ID,
+        'client_secret': CLIENT_SECRET,
+    }
+    post_request = requests.post(SPOTIFY_TOKEN_URL, data=code_payload)
+
+    # Auth Step 5: Tokens are Returned to Application
+    response_data = json.loads(post_request.text)
+    return  response_data["access_token"]
+
+def get_features_data(access_token):
+    id = currently_playing_id(access_token)
+    authorization_header = {
+        "Authorization": "Bearer {}".format(access_token)}
+
+    if id == 0:
+        return {
+            "error": True,
+            "message": "Not currently playing a song"
+        }
+    # Get Currently Playing Song Features
+    features_api_endpoint = "https://api.spotify.com/v1/audio-features/"+id
+    features_response = requests.get(
+        features_api_endpoint, headers=authorization_header)
+    features_data = json.loads(features_response.text)
+
+    return features_data
+
+def currently_playing_id(access_token):
+    # Auth Step 6: Use the access token to access Spotify API
+    authorization_header = {
+        "Authorization": "Bearer {}".format(access_token)}
+
+    try:
+        # Get Currently Playing Data
+        playing_api_endpoint = "https://api.spotify.com/v1/me/player/currently-playing"
+        playing_response = requests.get(
+            playing_api_endpoint, headers=authorization_header)
+        playing_data = json.loads(playing_response.text)
+    except:
+        return 0
+
+    return playing_data["item"]["id"]
