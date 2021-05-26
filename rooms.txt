@@ -1,0 +1,1 @@
+{"60376": {"60376": {"cpm": 250, "colors": ["F2604,6A6CD1,48803D"], "created": 621440, "dead": false, "version": 0, "room_number": 60376, "spotify_room": true}}, "574575": {"574575": {"cpm": 250, "colors": ["F2604,6A6CD1,48803D"], "created": 954435, "dead": false, "version": 0, "room_number": "574575", "spotify_room": true}}}

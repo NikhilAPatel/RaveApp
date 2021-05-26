@@ -233,9 +233,9 @@ def ML_room_create(features_data):
     rooms = get_rooms()
 
     # Generate room number
-    room_number = randint(0, 1000000)
+    room_number = (str)(randint(0, 1000000))
     while room_number in rooms.keys():
-        room_number = randint(0, 1000000)
+        room_number = (str)(randint(0, 1000000))
 
     dt = datetime.now()
 
