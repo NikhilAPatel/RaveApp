@@ -1,0 +1,2 @@
+name,artist,positive,neutral,negative,id,danceability,energy,key,loudness,mode,speechiness,acousticness,instrumentalness,liveness,valence,tempo
+Welcome To The Pleasuredome,Frankie Goes To Hollywood,1,0,0,6PF0WYSCH6OhGKHRHOQSxG,0.665,0.462,11,-18.178,0,0.0391,0.128,0.0157,0.649,0.518,113.205

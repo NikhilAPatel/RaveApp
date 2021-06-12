@@ -4,7 +4,7 @@ from flask import request
 import os
 import importlib
 
-production = True
+production = False
 
 #  Client Keys
 CLIENT_ID = os.getenv("CLIENT_ID")
