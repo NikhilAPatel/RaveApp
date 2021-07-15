@@ -1,11 +1,11 @@
 import random
 
 def ML_get_cpm(features_data):
-    return 250
+    return random.randint(250,500)
 
 def ML_get_colors(features_data):
     colors=[]
-    for i in range(0, 3):
+    for i in range(0, 7):
         letters = '0123456789ABCDEF'
         color = ''
         for i in range(0, 6):
